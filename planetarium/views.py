@@ -1,6 +1,6 @@
 from typing import Type
 
-from django.db.models import QuerySet
+from django.db.models import QuerySet, F, Count
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -23,7 +23,19 @@ from planetarium.serializers import (
     ShowSessionListSerializer,
     ReservationListSerializer,
     AstronomyShowImageSerializer,
+    ShowSessionDetailSerializer,
+    AstronomyShowDetailSerializer,
 )
+
+
+class ShowThemeViewSet(viewsets.ModelViewSet):
+    queryset = ShowTheme.objects.all()
+    serializer_class = ShowThemeSerializer
+
+
+class PlanetariumDomeViewSet(viewsets.ModelViewSet):
+    queryset = PlanetariumDome.objects.all()
+    serializer_class = PlanetariumDomeSerializer
 
 
 class AstronomyShowViewSet(viewsets.ModelViewSet):
@@ -52,8 +64,10 @@ class AstronomyShowViewSet(viewsets.ModelViewSet):
         return queryset.distinct()
 
     def get_serializer_class(self) -> Type[ModelSerializer]:
-        if self.action == "list" or self.action == "retrieve":
+        if self.action == "list":
             return AstronomyShowListSerializer
+        if self.action == "retrieve":
+            return AstronomyShowDetailSerializer
         if self.action == "upload_image":
             return AstronomyShowImageSerializer
         return AstronomyShowSerializer
@@ -73,20 +87,22 @@ class AstronomyShowViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class ShowThemeViewSet(viewsets.ModelViewSet):
-    queryset = ShowTheme.objects.all()
-    serializer_class = ShowThemeSerializer
-
-
 class ShowSessionViewSet(viewsets.ModelViewSet):
     queryset = ShowSession.objects.select_related(
         "astronomy_show", "planetarium_dome"
+    ).annotate(
+        tickets_available=(
+            F("planetarium_dome__rows") * F("planetarium_dome__seats_in_row")
+            - Count("tickets")
+        )
     )
     serializer_class = ShowSessionSerializer
 
     def get_serializer_class(self) -> Type[ModelSerializer]:
-        if self.action == "list" or self.action == "retrieve":
+        if self.action == "list":
             return ShowSessionListSerializer
+        if self.action == "retrieve":
+            return ShowSessionDetailSerializer
         return ShowSessionSerializer
 
     def get_queryset(self) -> QuerySet[ShowSession]:
@@ -104,11 +120,6 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class PlanetariumDomeViewSet(viewsets.ModelViewSet):
-    queryset = PlanetariumDome.objects.all()
-    serializer_class = PlanetariumDomeSerializer
-
-
 class ReservationViewSet(viewsets.ModelViewSet):
     queryset = Reservation.objects.select_related("user").prefetch_related(
         "tickets__show_session", "tickets__reservation"
@@ -119,3 +130,9 @@ class ReservationViewSet(viewsets.ModelViewSet):
         if self.action == "list" or self.action == "retrieve":
             return ReservationListSerializer
         return ReservationSerializer
+
+    def get_queryset(self) -> QuerySet[Reservation]:
+        return Reservation.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer) -> None:
+        serializer.save(user=self.request.user)
