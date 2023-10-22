@@ -1,6 +1,17 @@
+import os
+import uuid
+
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.text import slugify
+
+
+def image_file_path(instance, filename) -> str:
+    _, extension = os.path.splitext(filename)
+    filename = f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
+
+    return os.path.join("uploads/astronomy_shows/", filename)
 
 
 class AstronomyShow(models.Model):
@@ -9,6 +20,7 @@ class AstronomyShow(models.Model):
     show_theme = models.ManyToManyField(
         "ShowTheme", related_name="astronomy_shows"
     )
+    image = models.ImageField(null=True, upload_to=image_file_path)
 
     class Meta:
         ordering = ["title"]
@@ -34,6 +46,9 @@ class ShowSession(models.Model):
         related_name="show_sessions",
     )
     show_time = models.DateTimeField()
+
+    class Meta:
+        ordering = ["-show_time"]
 
     def __str__(self) -> str:
         return f"{self.astronomy_show} - {self.show_time} at {self.planetarium_dome}"
