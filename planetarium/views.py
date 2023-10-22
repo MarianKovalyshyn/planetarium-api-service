@@ -3,6 +3,7 @@ from typing import Type
 from django.db.models import QuerySet, F, Count
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 
@@ -120,11 +121,17 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
         return queryset
 
 
+class ReservationPagination(PageNumberPagination):
+    page_size = 1
+    max_page_size = 1
+
+
 class ReservationViewSet(viewsets.ModelViewSet):
     queryset = Reservation.objects.select_related("user").prefetch_related(
         "tickets__show_session", "tickets__reservation"
     )
     serializer_class = ReservationSerializer
+    pagination_class = ReservationPagination
 
     def get_serializer_class(self) -> Type[ModelSerializer]:
         if self.action == "list" or self.action == "retrieve":
