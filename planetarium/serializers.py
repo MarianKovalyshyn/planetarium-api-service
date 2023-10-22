@@ -14,12 +14,12 @@ from planetarium.models import (
 class AstronomyShowSerializer(serializers.ModelSerializer):
     class Meta:
         model = AstronomyShow
-        fields = ("id", "title", "description", "show_theme", "image")
+        fields = ("id", "title", "description", "show_themes", "image")
         read_only_fields = ("image",)
 
 
 class AstronomyShowListSerializer(AstronomyShowSerializer):
-    show_theme = serializers.StringRelatedField(many=True)
+    show_themes = serializers.StringRelatedField(many=True)
 
 
 class AstronomyShowImageSerializer(serializers.ModelSerializer):

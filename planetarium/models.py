@@ -7,7 +7,7 @@ from django.db import models
 from django.utils.text import slugify
 
 
-def image_file_path(instance, filename) -> str:
+def generate_path_for_image(instance, filename) -> str:
     _, extension = os.path.splitext(filename)
     filename = f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
 
@@ -17,10 +17,10 @@ def image_file_path(instance, filename) -> str:
 class AstronomyShow(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
-    show_theme = models.ManyToManyField(
+    show_themes = models.ManyToManyField(
         "ShowTheme", related_name="astronomy_shows"
     )
-    image = models.ImageField(null=True, upload_to=image_file_path)
+    image = models.ImageField(null=True, upload_to=generate_path_for_image)
 
     class Meta:
         ordering = ["title"]
@@ -88,6 +88,9 @@ class Reservation(models.Model):
         on_delete=models.CASCADE,
         related_name="reservations",
     )
+
+    class Meta:
+        ordering = ["-created_at"]
 
     def __str__(self) -> str:
         return f"{str(self.created_at)} by {self.user}"
