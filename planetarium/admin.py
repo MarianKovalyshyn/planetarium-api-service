@@ -10,9 +10,9 @@ from .models import (
     Reservation,
 )
 
-admin.register(AstronomyShow)
-admin.register(ShowTheme)
-admin.register(ShowSession)
-admin.register(PlanetariumDome)
-admin.register(Ticket)
-admin.register(Reservation)
+admin.site.register(AstronomyShow)
+admin.site.register(ShowTheme)
+admin.site.register(ShowSession)
+admin.site.register(PlanetariumDome)
+admin.site.register(Ticket)
+admin.site.register(Reservation)
