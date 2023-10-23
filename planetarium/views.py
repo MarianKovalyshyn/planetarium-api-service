@@ -15,6 +15,7 @@ from planetarium.models import (
     PlanetariumDome,
     Reservation,
 )
+from planetarium.permissions import IsAdminOrIfAuthenticatedReadOnly
 from planetarium.serializers import (
     AstronomyShowSerializer,
     ShowThemeSerializer,
@@ -34,16 +35,19 @@ from planetarium.serializers import (
 class ShowThemeViewSet(viewsets.ModelViewSet):
     queryset = ShowTheme.objects.all()
     serializer_class = ShowThemeSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 class PlanetariumDomeViewSet(viewsets.ModelViewSet):
     queryset = PlanetariumDome.objects.all()
     serializer_class = PlanetariumDomeSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 class AstronomyShowViewSet(viewsets.ModelViewSet):
     queryset = AstronomyShow.objects.prefetch_related("show_themes")
     serializer_class = AstronomyShowSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     @staticmethod
     def _params_to_ints(qs) -> list[int]:
@@ -73,7 +77,7 @@ class AstronomyShowViewSet(viewsets.ModelViewSet):
             return AstronomyShowDetailSerializer
         if self.action == "upload_image":
             return AstronomyShowImageSerializer
-        return AstronomyShowSerializer
+        return self.serializer_class
 
     @action(
         methods=["POST"],
@@ -120,13 +124,14 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
         )
     )
     serializer_class = ShowSessionSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self) -> Type[ModelSerializer]:
         if self.action == "list":
             return ShowSessionListSerializer
         if self.action == "retrieve":
             return ShowSessionDetailSerializer
-        return ShowSessionSerializer
+        return self.serializer_class
 
     def get_queryset(self) -> QuerySet[ShowSession]:
         """Retrieve the show sessions with filters"""
@@ -172,11 +177,12 @@ class ReservationViewSet(viewsets.ModelViewSet):
     queryset = Reservation.objects.prefetch_related("tickets__show_session")
     serializer_class = ReservationSerializer
     pagination_class = ReservationPagination
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self) -> Type[ModelSerializer]:
         if self.action == "list":
             return ReservationListSerializer
-        return ReservationSerializer
+        return self.serializer_class
 
     def get_queryset(self) -> QuerySet[Reservation]:
         return Reservation.objects.filter(user=self.request.user)
