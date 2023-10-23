@@ -44,16 +44,16 @@ class AstronomyShowImageSerializer(serializers.ModelSerializer):
         fields = ("id", "image")
 
 
-class TicketListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Ticket
-        fields = ("row", "seat")
-
-
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = ("id", "row", "seat", "show_session")
+
+
+class TicketListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields = ("row", "seat")
 
 
 class ShowSessionSerializer(serializers.ModelSerializer):

@@ -8,6 +8,29 @@ from django.utils.text import slugify
 from rest_framework.exceptions import ValidationError
 
 
+class ShowTheme(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class PlanetariumDome(models.Model):
+    name = models.CharField(max_length=255)
+    rows = models.IntegerField()
+    seats_in_row = models.IntegerField()
+
+    @property
+    def capacity(self) -> int:
+        return self.rows * self.seats_in_row
+
+    def __str__(self) -> str:
+        return f"{self.name} - {self.capacity} seats"
+
+
 def generate_path_for_image(instance, filename) -> str:
     _, extension = os.path.splitext(filename)
     filename = f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
@@ -30,13 +53,6 @@ class AstronomyShow(models.Model):
         return self.title
 
 
-class ShowTheme(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-
-    def __str__(self) -> str:
-        return self.name
-
-
 class ShowSession(models.Model):
     astronomy_show = models.ForeignKey(
         "AstronomyShow", on_delete=models.CASCADE, related_name="show_sessions"
@@ -53,19 +69,6 @@ class ShowSession(models.Model):
 
     def __str__(self) -> str:
         return f"{self.astronomy_show} - {self.show_time} at {self.planetarium_dome}"
-
-
-class PlanetariumDome(models.Model):
-    name = models.CharField(max_length=255)
-    rows = models.IntegerField()
-    seats_in_row = models.IntegerField()
-
-    @property
-    def capacity(self) -> int:
-        return self.rows * self.seats_in_row
-
-    def __str__(self) -> str:
-        return f"{self.name} - {self.capacity} seats"
 
 
 class Ticket(models.Model):

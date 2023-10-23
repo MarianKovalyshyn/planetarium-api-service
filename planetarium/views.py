@@ -79,6 +79,7 @@ class AstronomyShowViewSet(viewsets.ModelViewSet):
         url_path="upload-image",
     )
     def upload_image(self, request, pk=None) -> Response:
+        """Endpoint for uploading image to specific astronomy show"""
         astronomy_show = self.get_object()
         serializer = self.get_serializer(astronomy_show, data=request.data)
 
@@ -107,6 +108,7 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
         return ShowSessionSerializer
 
     def get_queryset(self) -> QuerySet[ShowSession]:
+        """Retrieve the show sessions with filters"""
         date = self.request.query_params.get("date")
         astronomy_show = self.request.query_params.get("astronomy_show")
 
@@ -122,19 +124,17 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
 
 
 class ReservationPagination(PageNumberPagination):
-    page_size = 1
-    max_page_size = 1
+    page_size = 5
+    max_page_size = 100
 
 
 class ReservationViewSet(viewsets.ModelViewSet):
-    queryset = Reservation.objects.select_related("user").prefetch_related(
-        "tickets__show_session", "tickets__reservation"
-    )
+    queryset = Reservation.objects.prefetch_related("tickets__show_session")
     serializer_class = ReservationSerializer
     pagination_class = ReservationPagination
 
     def get_serializer_class(self) -> Type[ModelSerializer]:
-        if self.action == "list" or self.action == "retrieve":
+        if self.action == "list":
             return ReservationListSerializer
         return ReservationSerializer
 
