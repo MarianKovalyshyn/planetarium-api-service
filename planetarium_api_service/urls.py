@@ -24,9 +24,13 @@ urlpatterns = [
     ),
     path("api/user/register/", CreateUserView.as_view(), name="create"),
     path(
-        "api/user/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"
+        "api/user/token/",
+        TokenObtainPairView.as_view(),
+        name="token_obtain_pair",
     ),
     path(
-        "api/user/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"
+        "api/user/token/refresh/",
+        TokenRefreshView.as_view(),
+        name="token_refresh",
     ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

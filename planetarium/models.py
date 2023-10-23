@@ -68,7 +68,10 @@ class ShowSession(models.Model):
         ordering = ["-show_time"]
 
     def __str__(self) -> str:
-        return f"{self.astronomy_show} - {self.show_time} at {self.planetarium_dome}"
+        return (
+            f"{self.astronomy_show} - {self.show_time} "
+            f"at {self.planetarium_dome}"
+        )
 
 
 class Ticket(models.Model):
@@ -86,7 +89,11 @@ class Ticket(models.Model):
 
     @staticmethod
     def validate_ticket(row, seat, planetarium_dome, error_to_raise) -> None:
-        for ticket_attr_value, ticket_attr_name, planetarium_dome_attr_name in [
+        for (
+            ticket_attr_value,
+            ticket_attr_name,
+            planetarium_dome_attr_name,
+        ) in [
             (row, "row", "rows"),
             (seat, "seat", "seats_in_row"),
         ]:
@@ -121,7 +128,11 @@ class Ticket(models.Model):
         )
 
     def __str__(self) -> str:
-        return f"{self.show_session} (row: {self.row}, seat: {self.seat}) by {self.reservation}"
+        return (
+            f"{self.show_session} "
+            f"(row: {self.row}, seat: {self.seat}) "
+            f"by {self.reservation}"
+        )
 
 
 class Reservation(models.Model):

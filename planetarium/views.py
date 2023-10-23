@@ -99,13 +99,15 @@ class AstronomyShowViewSet(viewsets.ModelViewSet):
             OpenApiParameter(
                 "title",
                 type=str,
-                description="Filter astronomy shows by title (ex. ?title=night)",
+                description="Filter astronomy shows by "
+                            "title (ex. ?title=night)",
                 required=False,
             ),
             OpenApiParameter(
                 "show_themes",
                 type={"type": "list", "items": {"type": "number"}},
-                description="Filter astronomy shows by show themes (ex. ?show_themes=2,5)",
+                description="Filter astronomy shows by "
+                            "show themes (ex. ?show_themes=2,5)",
                 required=False,
             ),
         ]
@@ -153,13 +155,15 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
             OpenApiParameter(
                 "date",
                 type=str,
-                description="Filter show sessions by date (ex. ?date=2023-12-31)",
+                description="Filter show sessions by "
+                            "date (ex. ?date=2023-12-31)",
                 required=False,
             ),
             OpenApiParameter(
                 "astronomy_show",
                 type=int,
-                description="Filter show sessions by astronomy show (ex. ?astronomy_show=4)",
+                description="Filter show sessions by "
+                            "astronomy show (ex. ?astronomy_show=4)",
                 required=False,
             ),
         ]
