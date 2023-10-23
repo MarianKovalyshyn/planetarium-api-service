@@ -15,7 +15,7 @@ ASTRONOMY_SHOW_URL = reverse("planetarium:astronomyshow-list")
 
 def sample_astronomy_show(**params) -> AstronomyShow:
     defaults = {
-        "title": "Sample movie",
+        "title": "Sample astronomy show",
         "description": "Sample description",
     }
     defaults.update(params)
@@ -42,18 +42,18 @@ class AuthenticatedAstronomyShowApiTests(TestCase):
         self.client.force_authenticate(self.user)
 
     def test_list_astronomy_shows(self):
-        sample_astronomy_show()
-        sample_astronomy_show()
+        sample_astronomy_show(title="Sample astronomy show 1")
+        sample_astronomy_show(title="Sample astronomy show 2")
 
         res = self.client.get(ASTRONOMY_SHOW_URL)
 
-        movies = AstronomyShow.objects.all()
-        serializer = AstronomyShowListSerializer(movies, many=True)
+        astronomy_shows = AstronomyShow.objects.all()
+        serializer = AstronomyShowListSerializer(astronomy_shows, many=True)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
 
-    def test_list_astronomy_shows_with_filters(self):
+    def test_list_astronomy_shows_with_filters_by_title(self):
         astronomy_show1 = sample_astronomy_show(
             title="Sample astronomy show 1"
         )
@@ -115,7 +115,7 @@ class AuthenticatedAstronomyShowApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
 
-class AdminMovieApiTests(TestCase):
+class AdminAstronomyShowApiTests(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
