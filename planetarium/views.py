@@ -1,6 +1,7 @@
 from typing import Type
 
 from django.db.models import QuerySet, F, Count
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -88,6 +89,25 @@ class AstronomyShowViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "title",
+                type=str,
+                description="Filter astronomy shows by title (ex. ?title=night)",
+                required=False,
+            ),
+            OpenApiParameter(
+                "show_themes",
+                type={"type": "list", "items": {"type": "number"}},
+                description="Filter astronomy shows by show themes (ex. ?show_themes=2,5)",
+                required=False,
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 
 class ShowSessionViewSet(viewsets.ModelViewSet):
     queryset = ShowSession.objects.select_related(
@@ -121,6 +141,25 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(astronomy_show_id=astronomy_show)
 
         return queryset
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "date",
+                type=str,
+                description="Filter show sessions by date (ex. ?date=2023-12-31)",
+                required=False,
+            ),
+            OpenApiParameter(
+                "astronomy_show",
+                type=int,
+                description="Filter show sessions by astronomy show (ex. ?astronomy_show=4)",
+                required=False,
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class ReservationPagination(PageNumberPagination):
