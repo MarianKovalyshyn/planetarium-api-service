@@ -42,7 +42,7 @@ class AstronomyShow(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     show_themes = models.ManyToManyField(
-        "ShowTheme", related_name="astronomy_shows"
+        "ShowTheme", related_name="astronomy_shows", blank=True
     )
     image = models.ImageField(null=True, upload_to=generate_path_for_image)
 
