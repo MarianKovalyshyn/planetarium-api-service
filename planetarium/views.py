@@ -2,7 +2,7 @@ from typing import Type
 
 from django.db.models import QuerySet, F, Count
 from drf_spectacular.utils import OpenApiParameter, extend_schema
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, generics
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -27,6 +27,7 @@ from planetarium.serializers import (
     AstronomyShowImageSerializer,
     ShowSessionDetailSerializer,
     AstronomyShowDetailSerializer,
+    UserSerializer,
 )
 
 
@@ -182,3 +183,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer) -> None:
         serializer.save(user=self.request.user)
+
+
+class CreateUserView(generics.CreateAPIView):
+    serializer_class = UserSerializer
